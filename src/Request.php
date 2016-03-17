@@ -8,12 +8,15 @@ class Request
     protected $post;
     protected $get;
     protected $server;
+    protected $session;
 
-    public function __construct($post, $get, $server)
+    public function __construct($post, $get, $server, Session $session)
     {
         $this->post = $post;
         $this->get = $get;
         $this->server = $server;
+        $this->session = $session;
+        $this->session->open();
     }
 
     public function getQueryParams()
@@ -44,6 +47,16 @@ class Request
     public function getServerParam($paramName)
     {
         return is_string($paramName) ? $this->server[$paramName] ?? null : null;
+    }
+
+    /**
+     * @TODO: maybe session is strange here... I don't use them much because we're API-focused.
+     *
+     * @return Session
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     /**

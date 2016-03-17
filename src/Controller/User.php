@@ -81,8 +81,8 @@ class User
     public function account()
     {
         $error = null;
-        if (!isset($_SESSION['AUTHENTICATED'])) {
-            header("Location: /user/login");
+        if (!$this->request->getSession()->get('AUTHENTICATED')) {
+            header("Location: /");
             exit;
         }
 
@@ -130,9 +130,9 @@ class User
             $password = $this->request->getPostParam('pass');
 
             if ($this->userModel->checkCredentials($username, $password)) {
-                session_regenerate_id();
-                $_SESSION['username'] = $username;
-                $_SESSION['AUTHENTICATED'] = true;
+                $this->request->getSession()->regenerateId();
+                $this->request->getSession()->add('username', $username);
+                $this->request->getSession()->add('AUTHENTICATED', true);
                 header("Location: /");
                 exit;
             } else {
@@ -156,7 +156,7 @@ class User
     public function logout()
     {
         // Log out, redirect
-        session_destroy();
+        $this->request->getSession()->destroy();
         header("Location: /");
     }
 }

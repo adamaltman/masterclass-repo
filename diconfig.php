@@ -26,12 +26,16 @@ $di->params[Masterclass\Db\Mysql::class] = [
     'pdo' => $di->lazyNew('PDO'),
 ];
 
+$di->params[Masterclass\Session::class] = [];
+
 $di->params[Masterclass\Request::class] = [
     'post' => $_POST,
     'get' => $_GET,
     'server' => $_SERVER,
+    'session' => $di->lazyNew(Masterclass\Session::class),
 ];
 $di->set('request', $di->lazyNew(Masterclass\Request::class));
+
 
 $di->params[Masterclass\Controller\Index::class] = [
     'model' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),

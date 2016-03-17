@@ -67,7 +67,7 @@ class Story
 
     public function create()
     {
-        if (!isset($_SESSION['AUTHENTICATED'])) {
+        if (!$this->request->getSession()->get('AUTHENTICATED')) {
             header("Location: /user/login");
             exit;
         }
@@ -83,7 +83,11 @@ class Story
             ) {
                 $error = 'You did not fill in all the fields or the URL did not validate.';
             } else {
-                $id = $this->story->createStory($headline, $url, $_SESSION['username']);
+                $id = $this->story->createStory(
+                    $headline,
+                    $url,
+                    $this->request->getSession()->get('username')
+                );
                 header("Location: /story/?id=$id");
                 exit;
             }

@@ -12,19 +12,18 @@ class Comment
 
     public function __construct(CommentModel $comment, Request $request)
     {
+        if (!$request->getSession()->get('AUTHENTICATED')) {
+            header("Location: /");
+            exit;
+        }
         $this->commentModel = $comment;
         $this->request = $request;
     }
 
     public function create()
     {
-        if (!isset($_SESSION['AUTHENTICATED'])) {
-            header("Location: /");
-            exit;
-        }
-
         $this->commentModel->addComment(
-            $_SESSION['username'],
+            $this->request->getSession()->get('username'),
             $this->request->getPostParam('story_id'),
             $this->request->getSanitizedValue($this->request->getPostParam('comment'))
         );
