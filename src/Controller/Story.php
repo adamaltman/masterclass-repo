@@ -2,6 +2,7 @@
 
 namespace Masterclass\Controller;
 
+use Aura\View\View;
 use Masterclass\Model\CommentMysqlDataStore;
 use Masterclass\Model\StoryMysqlDataStore as StoryModel;
 use Masterclass\Request;
@@ -11,12 +12,18 @@ class Story
     protected $comment;
     protected $story;
     protected $request;
+    protected $view;
 
-    public function __construct(CommentMysqlDataStore $comment, StoryModel $story, Request $request)
-    {
+    public function __construct(
+        CommentMysqlDataStore $comment,
+        StoryModel $story,
+        Request $request,
+        View $view
+    ) {
         $this->comment = $comment;
         $this->story = $story;
         $this->request = $request;
+        $this->view = $view;
     }
 
     public function index()
@@ -37,32 +44,17 @@ class Story
         $comments = $this->comment->getCommentsForStoryId($id);
         $comment_count = count($comments);
 
-        $content = '
-            <a class="headline" href="' . $story['url'] . '">' . $story['headline'] . '</a><br />
-            <span class="details">' . $story['created_by'] . ' | ' . $comment_count . ' Comments | 
-            ' . date('n/j/Y g:i a', strtotime($story['created_on'])) . '</span>
-        ';
-
-        if (isset($_SESSION['AUTHENTICATED'])) {
-            $content .= '
-            <form method="post" action="/comment/create">
-            <input type="hidden" name="story_id" value="' . $id . '" />
-            <textarea cols="60" rows="6" name="comment"></textarea><br />
-            <input type="submit" name="submit" value="Submit Comment" />
-            </form>            
-            ';
-        }
-
-        foreach ($comments as $comment) {
-            $content .= '
-                <div class="comment"><span class="comment_details">' . $comment['created_by'] . ' | ' .
-                date('n/j/Y g:i a', strtotime($story['created_on'])) . '</span>
-                ' . $comment['comment'] . '</div>
-            ';
-        }
-
-        require_once '/vagrant/layout.phtml';
-
+        $this->view->setLayout('layout');
+        $this->view->setView('story');
+        $this->view->setData(
+            [
+                'story' => $story,
+                'comment_count' => $comment_count,
+                'comments' => $comments,
+                'authenticated' => $this->request->getSession()->get('AUTHENTICATED'),
+            ]
+        );
+        echo $this->view->__invoke();
     }
 
     public function create()
@@ -93,17 +85,10 @@ class Story
             }
         }
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-        
-                <label>Headline:</label> <input type="text" name="headline" value="" /> <br />
-                <label>URL:</label> <input type="text" name="url" value="" /><br />
-                <input type="submit" name="create" value="Create" />
-            </form>
-        ';
-
-        require_once '/vagrant/layout.phtml';
+        $this->view->setLayout('layout');
+        $this->view->setView('story-create');
+        $this->view->setData(['error' => $error]);
+        echo $this->view->__invoke();
     }
 
 }

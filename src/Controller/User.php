@@ -2,19 +2,21 @@
 
 namespace Masterclass\Controller;
 
+use Aura\View\View;
 use Masterclass\Model\UserMysqlDataStore as UserModel;
 use Masterclass\Request;
 
 class User
 {
-
     protected $userModel;
     protected $request;
+    protected $view;
 
-    public function __construct(UserModel $model, Request $request)
+    public function __construct(UserModel $model, Request $request, View $view)
     {
         $this->userModel = $model;
         $this->request = $request;
+        $this->view = $view;
     }
 
     public function create()
@@ -63,19 +65,14 @@ class User
         }
         // Show the create form
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-                <label>Username</label> <input type="text" name="username" value="" /><br />
-                <label>Email</label> <input type="text" name="email" value="" /><br />
-                <label>Password</label> <input type="password" name="password" value="" /><br />
-                <label>Password Again</label> <input type="password" name="password_check" value="" /><br />
-                <input type="submit" name="create" value="Create User" />
-            </form>
-        ';
-
-        require_once '/vagrant/layout.phtml';
-
+        $this->view->setLayout('layout');
+        $this->view->setView('user-create');
+        $this->view->setData(
+            [
+                'error' => $error,
+            ]
+        );
+        echo $this->view->__invoke();
     }
 
     public function account()
@@ -105,27 +102,23 @@ class User
 
         $userModel = $this->userModel->loadUserByUsername($username);
 
-        $content = '
-        ' . $error . '<br />
-        
-        <label>Username:</label> ' . $username . '<br />
-        <label>Email:</label>' . $userModel->getEmail() . ' <br />
-
-         <form method="post">
-                ' . $error . '<br />
-            <label>Password</label> <input type="password" name="password" value="" /><br />
-            <label>Password Again</label> <input type="password" name="password_check" value="" /><br />
-            <input type="submit" name="updatepw" value="Create User" />
-        </form>';
-
-        require_once '/vagrant/layout.phtml';
+        $this->view->setLayout('layout');
+        $this->view->setView('user-account');
+        $this->view->setData(
+            [
+                'error' => $error,
+                'username' => $username,
+                'email' => $userModel->getEmail()
+            ]
+        );
+        echo $this->view->__invoke();
     }
 
     public function login()
     {
         $error = null;
         // Do the login
-        if (isset($_POST['login'])) {
+        if ($this->request->getPostParam('login')) {
             $username = $this->request->getPostParam('user');
             $password = $this->request->getPostParam('pass');
 
@@ -140,17 +133,14 @@ class User
             }
         }
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-                <label>Username</label> <input type="text" name="user" value="" />
-                <label>Password</label> <input type="password" name="pass" value="" />
-                <input type="submit" name="login" value="Log In" />
-            </form>
-        ';
-
-        require_once('/vagrant/layout.phtml');
-
+        $this->view->setLayout('layout');
+        $this->view->setView('user-login');
+        $this->view->setData(
+            [
+                'error' => $error,
+            ]
+        );
+        echo $this->view->__invoke();
     }
 
     public function logout()
