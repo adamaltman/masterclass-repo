@@ -57,6 +57,14 @@ $di->params[Masterclass\Controller\Index::class] = [
     'view' => $di->lazyNew(Aura\View\View::class),
 ];
 
+$di->params[Masterclass\Domain\Story\UseCase\ViewStory::class] = [
+    'storyDataStore' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),
+];
+
+$di->params[Masterclass\Domain\Story\UseCase\CreateStory::class] = [
+    'storyDataStore' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),
+];
+
 $di->params[Masterclass\Model\StoryMysqlDataStore::class] = [
     'dataStore' => $di->lazyNew(Masterclass\Db\Mysql::class),
 ];
@@ -79,9 +87,10 @@ $di->params[Masterclass\Controller\Comment::class] = [
 $di->params[Masterclass\Model\CommentMysqlDataStore::class] = [
     'dataStore' => $di->lazyNew(Masterclass\Db\Mysql::class),
 ];
+
 $di->params[Masterclass\Controller\Story::class] = [
-    'story' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),
-    'comment' => $di->lazyNew(Masterclass\Model\CommentMysqlDataStore::class),
+    'viewStory' => $di->lazyNew(Masterclass\Domain\Story\UseCase\ViewStory::class),
+    'createStory' => $di->lazyNew(Masterclass\Domain\Story\UseCase\CreateStory::class),
     'request' => $di->get('request'),
     'view' => $di->lazyNew(Aura\View\View::class),
 ];

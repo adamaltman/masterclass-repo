@@ -9,14 +9,14 @@ use Masterclass\Domain\ValueObject;
 
 class Comment extends ValueObject implements Value
 {
-    protected $createdByUserId;
+    protected $createdBy;
     protected $createdOn;
     protected $storyId;
     protected $text;
 
-    public function __construct(UserId $createdByUserId, DateTime $createdOn, StoryId $storyId, string $text)
+    public function __construct(string $createdBy, DateTime $createdOn, StoryId $storyId, string $text)
     {
-        $this->createdByUserId = $createdByUserId;
+        $this->createdBy = $createdBy;
         $this->createdOn = $createdOn;
         $this->storyId = $storyId;
         $this->setText($text);
@@ -48,7 +48,7 @@ class Comment extends ValueObject implements Value
 
     public function getCreatedBy()
     {
-        return $this->createdByUserId;
+        return $this->createdBy;
     }
 
     /**

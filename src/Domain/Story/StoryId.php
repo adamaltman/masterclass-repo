@@ -20,6 +20,11 @@ class StoryId extends ValueObject implements Value
         return $this->id;
     }
 
+    public function asInt()
+    {
+        return $this->id;
+    }
+
     protected function setId($id)
     {
         $this->id = $id;

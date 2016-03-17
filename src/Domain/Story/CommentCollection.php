@@ -6,16 +6,19 @@ class CommentCollection
 {
     protected $comments;
 
-    public function __construct(Comment ...$comments)
+    public function __construct($comments)
     {
         foreach ($comments as $comment) {
-            $this->comments[] = $comment;
+            $this->addComment($comment);
         }
     }
 
+    /**
+     * @return Comment[]
+     */
     public function getComments()
     {
-        return $this->getComments();
+        return $this->comments;
     }
 
     public function addComment(Comment $comment)

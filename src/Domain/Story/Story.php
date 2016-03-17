@@ -12,7 +12,7 @@ class Story extends ValueObject implements Value
     protected $storyId;
     protected $headline;
     protected $url;
-    protected $createdByUserId;
+    protected $createdBy;
     protected $createdOn;
     protected $commentCollection;
 
@@ -20,14 +20,14 @@ class Story extends ValueObject implements Value
         StoryId $id,
         string $headline,
         string $url,
-        UserId $createdByUserId,
+        string $createdBy,
         DateTime $createdOn,
         CommentCollection $commentCollection
     ) {
         $this->storyId = $id;
-        $this->headline = $this->setHeadline($headline);
-        $this->url = $this->setUrl($url);
-        $this->createdByUserId = $createdByUserId;
+        $this->setHeadline($headline);
+        $this->setUrl($url);
+        $this->createdBy = $createdBy;
         $this->createdOn = $createdOn;
         $this->commentCollection = $commentCollection;
     }
@@ -40,6 +40,34 @@ class Story extends ValueObject implements Value
     public function getId()
     {
         return $this->storyId;
+    }
+
+    public function getHeadline()
+    {
+        return $this->headline;
+    }
+
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    public function getCreatedBy()
+    {
+        return $this->createdBy;
+    }
+
+    public function getCreatedOn()
+    {
+        return $this->createdOn;
+    }
+
+    /**
+     * @return Comment[]
+     */
+    public function getComments()
+    {
+        return $this->commentCollection->getComments();
     }
 
     protected function setHeadline($headline)

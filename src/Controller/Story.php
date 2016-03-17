@@ -3,9 +3,10 @@
 namespace Masterclass\Controller;
 
 use Aura\View\View;
-use Masterclass\Model\CommentMysqlDataStore;
-use Masterclass\Model\StoryMysqlDataStore as StoryModel;
+use Masterclass\Domain\Story\UseCase\CreateStory;
+use Masterclass\Domain\Story\UseCase\ViewStory;
 use Masterclass\Request;
+
 
 class Story
 {
@@ -13,17 +14,19 @@ class Story
     protected $story;
     protected $request;
     protected $view;
+    protected $viewStory;
+    protected $createStory;
 
     public function __construct(
-        CommentMysqlDataStore $comment,
-        StoryModel $story,
         Request $request,
-        View $view
+        View $view,
+        ViewStory $viewStory,
+        CreateStory $createStory
     ) {
-        $this->comment = $comment;
-        $this->story = $story;
         $this->request = $request;
         $this->view = $view;
+        $this->viewStory = $viewStory;
+        $this->createStory = $createStory;
     }
 
     public function index()
@@ -34,23 +37,13 @@ class Story
             exit;
         }
 
-        $story = $this->story->loadStoryById($id);
-
-        if (empty($story)) {
-            header("Location: /");
-            exit;
-        }
-
-        $comments = $this->comment->getCommentsForStoryId($id);
-        $comment_count = count($comments);
+        $story = $this->viewStory->handle($id);
 
         $this->view->setLayout('layout');
         $this->view->setView('story');
         $this->view->setData(
             [
                 'story' => $story,
-                'comment_count' => $comment_count,
-                'comments' => $comments,
                 'authenticated' => $this->request->getSession()->get('AUTHENTICATED'),
             ]
         );
@@ -75,11 +68,8 @@ class Story
             ) {
                 $error = 'You did not fill in all the fields or the URL did not validate.';
             } else {
-                $id = $this->story->createStory(
-                    $headline,
-                    $url,
-                    $this->request->getSession()->get('username')
-                );
+                $story = $this->createStory->handle($headline, $url, $this->request->getSession()->get('username'));
+                $id = $story->getId()->asInt();
                 header("Location: /story/?id=$id");
                 exit;
             }
@@ -90,5 +80,4 @@ class Story
         $this->view->setData(['error' => $error]);
         echo $this->view->__invoke();
     }
-
 }

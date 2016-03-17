@@ -28,6 +28,6 @@ class Comment
             $this->request->getSanitizedValue($this->request->getPostParam('comment'))
         );
 
-        header("Location: /story/?id=" . $_POST['story_id']);
+        header("Location: /story/?id=" . (string) $this->request->getPostParam('story_id'));
     }
 }
