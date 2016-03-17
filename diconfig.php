@@ -3,6 +3,9 @@
 use Masterclass\Controller;
 use Aura\Di\Container;
 use Aura\Di\Factory;
+use Aura\View\ViewFactory;
+use Aura\View\TemplateRegistry;
+use Aura\View\HelperRegistry;
 
 $di = new Container(new Factory());
 
@@ -26,6 +29,19 @@ $di->params[Masterclass\Db\Mysql::class] = [
     'pdo' => $di->lazyNew('PDO'),
 ];
 
+$di->params[Aura\View\View::class] = [
+    'view_registry' => $di->lazyNew(
+        TemplateRegistry::class,
+        [
+            'paths' => [
+                $config['viewPath']
+            ]
+        ]
+    ),
+    'layout_registry' => $di->lazyNew(TemplateRegistry::class, ['paths' => [$config['viewPath']]]),
+    'helpers' => $di->lazyNew(HelperRegistry::class),
+];
+
 $di->params[Masterclass\Session::class] = [];
 
 $di->params[Masterclass\Request::class] = [
@@ -36,9 +52,9 @@ $di->params[Masterclass\Request::class] = [
 ];
 $di->set('request', $di->lazyNew(Masterclass\Request::class));
 
-
 $di->params[Masterclass\Controller\Index::class] = [
     'model' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),
+    'view' => $di->lazyNew(Aura\View\View::class),
 ];
 
 $di->params[Masterclass\Model\StoryMysqlDataStore::class] = [
@@ -48,6 +64,7 @@ $di->params[Masterclass\Model\StoryMysqlDataStore::class] = [
 $di->params[Masterclass\Controller\User::class] = [
     'model' => $di->lazyNew(Masterclass\Model\UserMysqlDataStore::class),
     'request' => $di->get('request'),
+    'view' => $di->lazyNew(Aura\View\View::class),
 ];
 
 $di->params[Masterclass\Model\UserMysqlDataStore::class] = [
@@ -66,6 +83,7 @@ $di->params[Masterclass\Controller\Story::class] = [
     'story' => $di->lazyNew(Masterclass\Model\StoryMysqlDataStore::class),
     'comment' => $di->lazyNew(Masterclass\Model\CommentMysqlDataStore::class),
     'request' => $di->get('request'),
+    'view' => $di->lazyNew(Aura\View\View::class),
 ];
 
 $di->params[Masterclass\RouteMap::class] = [

@@ -1,7 +1,6 @@
 <?php
 
-session_start();
-
+$path = realpath(__DIR__ . '/..');
 $config = require_once('../config.php');
 require_once '../vendor/autoload.php';
 
